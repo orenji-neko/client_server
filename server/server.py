@@ -19,7 +19,7 @@ class Server:
         print("listening for connections...")
 
         # client
-        client_con, client_addr = self.server.accept((self.IP, self.PORT))
+        client_con, client_addr = self.server.accept()
         
         while(True):
             msg = input()
