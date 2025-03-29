@@ -1,4 +1,6 @@
 import socket
+import os
+
 
 class Client:
     # server
@@ -7,16 +9,21 @@ class Client:
 
     client: socket.socket
 
-    def __init__(self, addr, port = 8721):
+    def __init__(self, addr, port=8721):
         # server
         self.PORT = port
         self.IP = addr
 
         # define socket
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect((self.IP, self.PORT))
+        try:
+            self.client.connect((self.IP, self.PORT))
+        except:
+            print("err...")
+            return
 
-        msg = self.client.recv(1024)
-        print("Received msg!")
-        print(msg.decode())
-        self.client.close();
+        while True:
+            msg = self.client.recv(1024).decode()
+            print(msg)
+
+        self.client.close()

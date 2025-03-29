@@ -19,7 +19,10 @@ class Server:
         print("listening for connections...")
 
         # client
-        client_con, client_addr = self.server.accept()
-        client_con.send("Hello, world!".encode())
-        print("Sent!")
+        client_con, client_addr = self.server.accept
+        
+        while(True):
+            msg = input()
+            client_con.send(msg.encode())
+
         client_con.close()
