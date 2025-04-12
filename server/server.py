@@ -16,8 +16,13 @@ class Server:
     server: socket
     connections: list[Connection]
 
+    # Threads
+    main_thread: Thread
+    con_threads: list[Thread]
+
     def __init__(self, address: str, port=8721):
         self.connections = []
+        self.con_threads = []
 
         self.PORT = port
         self.ADDRESS = address
@@ -29,22 +34,29 @@ class Server:
     # This server handles connections
     # between multiple clients using 
     # multithreading.
-    def listen(self):
+    def start(self):
         # This thread handles accepting 
         # connections from multiple clients.
-        main_thread = Thread(target=self._main_thread, name="main_thread")
-        main_thread.start()
+        self.main_thread = Thread(target=self._main_thread, name="main_thread")
+        self.main_thread.start()
 
     # Main Thread
     def _main_thread(self):
         self.server.listen(5)
-        print(f"Listening at port {self.PORT}...")
 
         while(True):
             con, addr = self.server.accept()
-            print(f"Established connection to {addr[0]}...")
             # Add accepted connection to connections list.
-            self.connections.append(Connection(address=addr[0], connection=con))
+            new_connection = Connection(address=addr[0], connection=con)
+            self.connections.append(new_connection)
+            # create connection thread
+            self.con_threads = Thread(target=self._con_thread(new_connection))
+
+    # Connection thread
+    def _con_thread(self, connection: Connection):
+        while(True):
+            out = connection.connection.recv(1024).decode()
+            print(f"\nOUT [{connection.address}] - {out}")
 
     # Get connection list
     def get_connections(self):
